@@ -18,6 +18,14 @@ There are 4 major bash functions:
 usage example
 -------------
 
+one has first to source the ``ave_rc.sh`` file (can be done in your
+.login) like so:
+::
+  
+  $ source ave_rc.sh
+
+then one can use the ``ave-*`` functions like so:
+
 ::
 
   $ mkdir -p /tmp/example
