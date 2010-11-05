@@ -1,0 +1,4 @@
+2010-11-05  Sebastien Binet  <sebastien.binet@cern.ch>
+
+	* ave_rc.sh: removing the tmux-oriented ave- functions
+

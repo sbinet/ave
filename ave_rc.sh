@@ -5,7 +5,7 @@
 
 alias wipeBin='find -name "i686*" -exec rm -rf {} \;'
 alias atn=/afs/cern.ch/atlas/software/dist/nightlies/atn/atn
-alias myuuidgen='uuidgen | tr "[:lower:]" "[:upper:]"'
+alias ave-uuidgen='uuidgen | tr "[:lower:]" "[:upper:]"'
 alias wkarea='cmt bro "mkdir ../$CMTCONFIG;echo \"OK\""'
 alias pmake='make -s -j3 QUIET=1 PEDANTIC=1'
 alias brmake='cmt bro make -s -j3 QUIET=1 PEDANTIC=1'
@@ -32,87 +32,6 @@ export AVE_CMT_VERSION=v1r20p20090520
 export AVE_CMT_VERSION=v1r21
 export AVE_CMT_ROOT=/afs/cern.ch/sw/contrib/CMT
 
-function ave-start-tmux()
-{
-    # ---
-    session_name=$1; shift
-    if [[ -z ${session_name} ]]; then
-        echo "** you need to provide 2 arguments to ave-start-tmux:"
-        echo "** $ ave-start-tmux my_session_name rel_1,dev,gcc43"
-        return 1
-    fi
-
-    # ---
-    ave_login_args=$1; shift
-    if [[ -z ${ave_login_args} ]]; then
-        echo "** you need to provide 2 arguments to ave-start-tmux:"
-        echo "** $ ave-start-tmux my_session_name rel_1,dev,gcc43"
-        return 1
-    fi
-
-    short_name=${session_name}
-    session_name=${session_name}-${ave_login_args//,/-}
-    echo "::: starting a new ave-session... [$session_name]"
-
-    #ave-login ${ave_login_args}; ave-workarea
-
-    tmux new-session -d -s ${session_name}
-    tmux new-window -t ${session_name} -n dev-${short_name} zsh
-    tmux new-window -t ${session_name} -n compile-${short_name} zsh
-    tmux select-window -t ${session_name}:0
-    #ave-login ${ave_login_args}; ave-workarea;
-
-
-    # setup the environment in each window...
-    #cmd=''
-    #cmd="mkdir toto ; cd toto ;"
-    #tmux send-keys -t ${session_name}:0 'ave-login $ave_login_args' 'ave-workarea '
-    #cmd='ave-login ${ave_login_args}; cd WorkArea/cmt; source ./setup.sh; cd -;'
-    #cmd="cd toto ;"
-    #tmux send-keys -t ${session_name}:1 '`ave-login ${ave_login_args}; cd WorkArea/cmt; source ./setup.sh; cd - ;`'
-    #tmux send-keys -t ${session_name}:2 'ave-login ${ave_login_args}; cd WorkArea/cmt; source ./setup.sh; cd - ;' 'echo foo'
-
-    orig_dir=`pwd`
-    ave_lockfile=${orig_dir}/ave_login.lock
-    touch ${ave_lockfile}.1
-    touch ${ave_lockfile}.2
-
-    echo "::: config session-0"
-    tmux set-buffer -t ${session_name} "ave-login $ave_login_args ; ave-workarea ; echo \"removing [$ave_lockfile]\" ; /bin/rm -f $ave_lockfile.1 ;;"
-    tmux paste-buffer -t ${session_name}:0
-    tmux send-keys -t ${session_name}:0 Enter
-
-    echo "::: config session-1"
-    tmux set-buffer -t ${session_name} "lockfile $ave_lockfile.1 ; ave-login $ave_login_args ; cd WorkArea/cmt ; source ./setup.sh ; cd $orig_dir ; /bin/rm -f $ave_lockfile.2 ;;"
-    tmux paste-buffer -t ${session_name}:1
-    tmux send-keys -t ${session_name}:1 Enter
-    tmux set-buffer -t ${session_name} "emacsclient -tc ;;"
-    tmux paste-buffer -t ${session_name}:1
-    tmux send-keys -t ${session_name}:1 Enter
-
-    echo "::: config session-2"
-    tmux set-buffer -t ${session_name} "lockfile $ave_lockfile.2 ; ave-login $ave_login_args ; cd WorkArea/cmt ; source ./setup.sh ; cd $orig_dir ; /bin/rm -rf ave_login.lock* ;;"
-    tmux paste-buffer -t ${session_name}:2
-    tmux send-keys -t ${session_name}:2 Enter
-
-    tmux set-buffer -t ${session_name} ""
-
-
-
-    echo "::: starting a new ave-session... [$session_name] [done]"
-
-    tmux -2 attach-session -t ${session_name}
-}
-
-function ave-stop-tmux()
-{
-    session_name=$1; shift
-    echo "::: stopping ave-session... [$session_name]"
-    tmux kill-session -t ${session_name} || return $?
-    rc=$?
-    echo "::: stopping ave-session... [$session_name] [done]"
-    return $rc
-}
 
 function ave-login()
 {
