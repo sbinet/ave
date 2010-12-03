@@ -78,6 +78,7 @@ os = slc5
 save = True
 #standalone = False       # prefer build area instead of kit-release
 #standalone = True       # prefer release area instead of build-area
+testarea=<pwd>           # have the current working directory be the testarea
 EOF
 
     export AVE_LOGIN_ARGS="$args"
