@@ -15,7 +15,7 @@ alias avn='~binet/public/tools/avn'
 alias vo='ssh -Y voatlas51'
 
 ## new python-based atlas-login
-export AtlasSetup=/afs/cern.ch/atlas/software/dist/AtlasSetup
+export AtlasSetup=/afs/cern.ch/atlas/software/dist/beta/AtlasSetup
 alias alogin='source $AtlasSetup/scripts/asetup.sh $*'
 
 ## poor man's way of getting the same result than:
@@ -79,11 +79,16 @@ save = True
 #standalone = False       # prefer build area instead of kit-release
 #standalone = True       # prefer release area instead of build-area
 testarea=<pwd>           # have the current working directory be the testarea
+
+[aliases]
+# support for CVMFS
+cvmfs = releasesarea = /opt/atlas/software/manageTier3SW/ATLASLocalRootBase/Athena/i686_slc5_gcc43_opt /opt/atlas/software/manageTier3SW/ATLASLocalRootBase/Athena/i686_slc4_gcc34_opt /afs/cern.ch/atlas/software/releases               
+
 EOF
 
     export AVE_LOGIN_ARGS="$args"
     echo "::: configuring athena for [$AVE_LOGIN_ARGS]..."
-    source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg $AVE_LOGIN_ARGS || return 1
+    source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg "$@" || return 1
     /bin/cat >| .ave_config.rc <<EOF
 [ave]
 login-time = `date`

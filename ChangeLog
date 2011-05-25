@@ -1,3 +1,14 @@
+2011-05-25  Sebastien Binet  <binet@lxplus002.cern.ch>
+
+	* migrate to AtlasSetup-BETA.
+	* properly propagate ave-login arguments to asetup.
+	* M ave_rc.sh
+
+2010-12-03  Sebastien Binet  <binet@lxplus439.cern.ch>
+
+	* ave_rc.sh: support for new asetup default for testarea
+	  pwd is not anymore the default
+
 2010-11-05  Sebastien Binet  <sebastien.binet@cern.ch>
 
 	* ave_rc.sh: removing the tmux-oriented ave- functions
