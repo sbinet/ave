@@ -65,7 +65,9 @@ function ave-login()
 
     /bin/cat >| ${PWD}/.asetup.cfg <<EOF
 [defaults]
-default32 = True
+#default32 = True
+default32 = False
+force32bit = False
 opt = True
 gcc43default = True
 lang = C
@@ -88,7 +90,7 @@ EOF
 
     export AVE_LOGIN_ARGS="$args"
     echo "::: configuring athena for [$AVE_LOGIN_ARGS]..."
-    source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg "$@" || return 1
+    source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg $args || return 1
     /bin/cat >| .ave_config.rc <<EOF
 [ave]
 login-time = `date`
