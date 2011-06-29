@@ -121,8 +121,7 @@ function ave-workarea()
     /bin/rm -rf InstallArea
     abootstrap-wkarea.py "$@" || return 1
     # install the Makefile(s) to speed-up the build
-    # FIXME: what should we do when no AFS or no valid AFS-token ??
-    /bin/ln -sfn /afs/cern.ch/user/a/atnight/public/Makefile.{cmt,atlas} .
+    ave-fetch-pmakefile || return 1
     pushd WorkArea/cmt
     ave-config           || return 1
     popd
@@ -134,6 +133,12 @@ function ave-workarea()
     popd
     pushd WorkArea/run
     echo "::: building workarea... [done]"
+}
+
+function ave-fetch-pmakefile()
+{
+    # FIXME: what should we do when no AFS or no valid AFS-token ??
+    /bin/ln -sf /afs/cern.ch/user/a/atnight/public/Makefile.{cmt,atlas} . || return 1
 }
 
 function ave-config()
