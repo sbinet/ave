@@ -66,8 +66,8 @@ function ave-login()
     /bin/cat >| ${PWD}/.asetup.cfg <<EOF
 [defaults]
 #default32 = True
-default32 = False
-force32bit = False
+#default32 = False       # asetup is now clever enough to choose
+#force32bit = False      # the correct 32/64 default
 opt = True
 gcc43default = True
 lang = C
@@ -120,9 +120,16 @@ function ave-workarea()
     echo "::: building workarea..."
     /bin/rm -rf InstallArea
     abootstrap-wkarea.py "$@" || return 1
+    # install the Makefile(s) to speed-up the build
+    # FIXME: what should we do when no AFS or no valid AFS-token ??
+    /bin/ln -sfn /afs/cern.ch/user/a/atnight/public/Makefile.{cmt,atlas} .
     pushd WorkArea/cmt
     ave-config           || return 1
-    ave-brmake           || return 1
+    popd
+    #make -f Makefile.atlas "${AVE_MAKE_DEFAULT_OPTS}" "$@" || return 1
+    ave-pmake "$@" || return 1
+    #ave-brmake           || return 1
+    pushd WorkArea/cmt
     source ./setup.sh    || return 1
     popd
     pushd WorkArea/run
@@ -140,9 +147,16 @@ function ave-make()
     cmt make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
 }
 
+function ave-pmake()
+{
+    echo "::: using top-level Makefile.atlas to build..."
+    ave-make -f Makefile.atlas "$@" || return 1
+    echo "::: using top-level Makefile.atlas to build... [done]"
+}
+
 function ave-brmake()
 {
-    cmt bro make ${AVE_MAKE_DEFAULT_OPTS} || return 1
+    cmt bro make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
 }
 
 function ave-reco-tests()
