@@ -84,7 +84,7 @@ testarea=<pwd>           # have the current working directory be the testarea
 
 [aliases]
 # support for CVMFS
-cvmfs = releasesarea = /opt/atlas/software/manageTier3SW/ATLASLocalRootBase/Athena/i686_slc5_gcc43_opt /opt/atlas/software/manageTier3SW/ATLASLocalRootBase/Athena/i686_slc4_gcc34_opt /afs/cern.ch/atlas/software/releases               
+cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
 
 EOF
 
