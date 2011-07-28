@@ -84,13 +84,13 @@ testarea=<pwd>           # have the current working directory be the testarea
 
 [aliases]
 # support for CVMFS
-cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
+cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/\$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/\$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/\$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
 
 EOF
 
     export AVE_LOGIN_ARGS="$args"
     echo "::: configuring athena for [$AVE_LOGIN_ARGS]..."
-    source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg $args || return 1
+    source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg "${AVE_LOGIN_ARGS}" || return 1
     /bin/cat >| .ave_config.rc <<EOF
 [ave]
 login-time = `date`
