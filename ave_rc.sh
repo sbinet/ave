@@ -3,7 +3,7 @@
 ## @date November 2009
 ## @purpose a set of bash functions to ease the Athena-CMT pain
 
-alias wipeBin='find -name "i686*" -exec rm -rf {} \;'
+alias wipeBin='find -type d -name "i686-*" -o -name "x86_64-*" -exec rm -rf {} \;'
 alias atn=/afs/cern.ch/atlas/software/dist/nightlies/atn/atn
 alias ave-uuidgen='uuidgen | tr "[:lower:]" "[:upper:]"'
 alias wkarea='cmt bro "mkdir ../$CMTCONFIG;echo \"OK\""'
@@ -82,9 +82,9 @@ save = True
 #standalone = True       # prefer release area instead of build-area
 testarea=<pwd>           # have the current working directory be the testarea
 
-[aliases]
-# support for CVMFS
-cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/\$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/\$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/\$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
+#[aliases]
+# support for CVMFS - now done by AtlasSetup out of the box...
+#cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/\$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/\$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/\$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
 
 EOF
 
