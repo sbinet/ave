@@ -3,7 +3,7 @@
 ## @date November 2009
 ## @purpose a set of bash functions to ease the Athena-CMT pain
 
-alias wipeBin='find -type d -name "i686-*" -o -name "x86_64-*" -exec rm -rf {} \;'
+alias wipeBin='find -name "i686-*" -o -name "x86_64-*" -exec rm -rf {} \;'
 alias atn=/afs/cern.ch/atlas/software/dist/nightlies/atn/atn
 alias ave-uuidgen='uuidgen | tr "[:lower:]" "[:upper:]"'
 alias wkarea='cmt bro "mkdir ../$CMTCONFIG;echo \"OK\""'
@@ -325,6 +325,15 @@ function ave-valgrind-drd()
 	    --trace-fork-join=yes \
 	    --read-var-info=yes \
         `which athena.py` --stdcmalloc $args 2>&1 | tee valgrind.drd.log
+}
+
+function ave-voms-proxy-init()
+{
+  ( # spawn a subshell so python version used by 'gd' does not interfere
+    # with the current one (most probably from athena)
+    source /afs/cern.ch/project/gd/LCG-share/current/etc/profile.d/grid_env.sh
+    voms-proxy-init -voms atlas    
+  )
 }
 
 # function ave-reload()
