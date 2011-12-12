@@ -329,11 +329,18 @@ function ave-valgrind-drd()
 
 function ave-voms-proxy-init()
 {
+  export X509_USER_PROXY=${HOME}/private/x509proxy
   ( # spawn a subshell so python version used by 'gd' does not interfere
     # with the current one (most probably from athena)
     source /afs/cern.ch/project/gd/LCG-share/current/etc/profile.d/grid_env.sh
-    voms-proxy-init -voms atlas    
+    voms-proxy-init -voms atlas -out ${X509_USER_PROXY}
   )
+  if [ -f $X509_USER_PROXY ]
+  then
+      echo "::: fetching X509_USER_PROXY back..."
+      echo "::: X509_USER_PROXY=$X509_USER_PROXY"
+      echo "::: fetching X509_USER_PROXY back... [done]"
+  fi  
 }
 
 # function ave-reload()
