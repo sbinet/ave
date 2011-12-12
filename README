@@ -128,3 +128,11 @@ ave-valgrind-helgrind
 same as for the other commands, but running the thread data race
 conditions checker tool.
 
+
+ave-voms-proxy-init
+-------------------
+
+helper function to setup the grid credentials (in a subshell so the athena
+environment won't be borked) so TagCollector command-line tools will work 
+correctly.
+
