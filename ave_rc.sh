@@ -18,6 +18,9 @@ alias vo='ssh -Y voatlas51'
 export AtlasSetup=/afs/cern.ch/atlas/software/dist/beta/AtlasSetup
 alias alogin='source $AtlasSetup/scripts/asetup.sh $*'
 
+## for voms authentication's benefit
+export X509_USER_PROXY=${HOME}/private/x509proxy
+
 ## poor man's way of getting the same result than:
 ## os.sysconf("SC_NPROCESSORS_ONLN")
 if [[ -e "/proc/cpuinfo" ]]; then
@@ -25,7 +28,7 @@ if [[ -e "/proc/cpuinfo" ]]; then
 else
     export AVE_NCPUS='1'
 fi
-export AVE_MAKE_DEFAULT_OPTS='-s -j${AVE_NCPUS} QUIET=1 PEDANTIC=1'
+export AVE_MAKE_DEFAULT_OPTS='-s -j${AVE_NCPUS} -l${AVE_NCPUS} QUIET=1 PEDANTIC=1'
 
 export AVE_VALGRIND=${HOME}/.local/usr/bin/valgrind
 export AVE_CMT_VERSION=v1r20p20090520
@@ -88,7 +91,7 @@ testarea=<pwd>           # have the current working directory be the testarea
 
 EOF
 
-    export AVE_LOGIN_ARGS="$args"
+    export AVE_LOGIN_ARGS="${args[@]}"
     echo "::: configuring athena for [$AVE_LOGIN_ARGS]..."
     source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg "${AVE_LOGIN_ARGS}" || return 1
     /bin/cat >| .ave_config.rc <<EOF
@@ -121,14 +124,15 @@ function ave-workarea()
     /bin/rm -rf InstallArea
     abootstrap-wkarea.py "$@" || return 1
     # install the Makefile(s) to speed-up the build
-    ave-fetch-pmakefile || return 1
+    #ave-fetch-pmakefile || return 1
     pushd WorkArea/cmt
     ave-config           || return 1
-    popd
+    #popd
     #make -f Makefile.atlas "${AVE_MAKE_DEFAULT_OPTS}" "$@" || return 1
-    ave-pmake "$@" || return 1
-    #ave-brmake           || return 1
-    pushd WorkArea/cmt
+    #ave-pmake "$@" || return 1
+    source ./setup.sh    || return 1
+    ave-brmake           || return 1
+    #pushd WorkArea/cmt
     source ./setup.sh    || return 1
     popd
     pushd WorkArea/run
