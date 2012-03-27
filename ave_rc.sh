@@ -31,10 +31,14 @@ fi
 export AVE_MAKE_DEFAULT_OPTS='-s -j${AVE_NCPUS} -l${AVE_NCPUS} QUIET=1 PEDANTIC=1'
 
 export AVE_VALGRIND=${HOME}/.local/usr/bin/valgrind
+export AVE_VALGRIND=valgrind
 export AVE_CMT_VERSION=v1r20p20090520
 export AVE_CMT_VERSION=v1r21
+export AVE_CMT_VERSION=v1r24
 export AVE_CMT_ROOT=/afs/cern.ch/sw/contrib/CMT
 
+# enable cmt-v1r24 parallel make
+export CMTBCAST=1
 
 function ave-login()
 {
@@ -81,9 +85,10 @@ setup = True
 os = slc5
 #project = AtlasOffline  # offline is the default
 save = True
-#standalone = False       # prefer build area instead of kit-release
+#standalone = False      # prefer build area instead of kit-release
 #standalone = True       # prefer release area instead of build-area
 testarea=<pwd>           # have the current working directory be the testarea
+cmtbcast = True          # enable cmt-broadcast
 
 #[aliases]
 # support for CVMFS - now done by AtlasSetup out of the box...
@@ -165,7 +170,11 @@ function ave-pmake()
 
 function ave-brmake()
 {
-    cmt bro make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
+    if [[ "x$CMTBCAST" == "x" ]]; then
+        cmt bro make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
+    else
+        ave-make || return 1
+    fi
 }
 
 function ave-reco-tests()
