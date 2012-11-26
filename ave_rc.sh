@@ -38,7 +38,7 @@ export AVE_CMT_VERSION=v1r24
 export AVE_CMT_ROOT=/afs/cern.ch/sw/contrib/CMT
 
 # enable cmt-v1r24 parallel make
-export CMTBCAST=1
+export AVE_CMTBCAST=1
 
 function ave-login()
 {
@@ -88,11 +88,10 @@ save = True
 #standalone = False      # prefer build area instead of kit-release
 #standalone = True       # prefer release area instead of build-area
 testarea=<pwd>           # have the current working directory be the testarea
-cmtbcast = True          # enable cmt-broadcast
+cmtbcast = False         # disable cmt-broadcast
 
-#[aliases]
-# support for CVMFS - now done by AtlasSetup out of the box...
-#cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/\$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/\$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/\$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
+[aliases]
+cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/\$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/\$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/\$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
 
 EOF
 
@@ -127,27 +126,19 @@ function ave-workarea()
 {
     echo "::: building workarea..."
     /bin/rm -rf InstallArea
+    find $TestArea \
+        -name "genConf" \
+        -o -name "$CMTCONFIG" \
+        -exec /bin/rm -rf {} \;
     abootstrap-wkarea.py "$@" || return 1
-    # install the Makefile(s) to speed-up the build
-    #ave-fetch-pmakefile || return 1
     pushd WorkArea/cmt
     ave-config           || return 1
-    #popd
-    #make -f Makefile.atlas "${AVE_MAKE_DEFAULT_OPTS}" "$@" || return 1
-    #ave-pmake "$@" || return 1
     source ./setup.sh    || return 1
     ave-brmake           || return 1
-    #pushd WorkArea/cmt
     source ./setup.sh    || return 1
     popd
     pushd WorkArea/run
     echo "::: building workarea... [done]"
-}
-
-function ave-fetch-pmakefile()
-{
-    # FIXME: what should we do when no AFS or no valid AFS-token ??
-    /bin/ln -sf /afs/cern.ch/user/a/atnight/public/Makefile.{cmt,atlas} . || return 1
 }
 
 function ave-config()
@@ -158,22 +149,17 @@ function ave-config()
 
 function ave-make()
 {
+    unset CMTBCAST
     cmt make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
-}
-
-function ave-pmake()
-{
-    echo "::: using top-level Makefile.atlas to build..."
-    ave-make -f Makefile.atlas "$@" || return 1
-    echo "::: using top-level Makefile.atlas to build... [done]"
 }
 
 function ave-brmake()
 {
-    if [[ "x$CMTBCAST" == "x" ]]; then
-        cmt bro make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
+    if [[ "$AVE_CMTBCAST" == "1" ]]; then
+        CMTBCAST=1 \
+        cmt make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
     else
-        ave-make || return 1
+        cmt bro make ${AVE_MAKE_DEFAULT_OPTS} "$@" || return 1
     fi
 }
 
@@ -360,3 +346,43 @@ function ave-voms-proxy-init()
 # {
 #     . ~/public/Athena/ave_rc.sh
 # }
+
+function ave-gpt-cpu-profile()
+{
+    args=("$@")
+    ave_gpt_cpuprofile=ave-gpt-$$.cpu.profile
+    /bin/rm -rf ${ave_gpt_cpuprofile}* 2> /dev/null
+    echo "::: running gpt-cpu-profiler (outfile=$ave_gpt_cpuprofile)..."
+    TCMALLOCDIR=${ATLAS_GPERFTOOLS_DIR} \
+    LD_PRELOAD=libtcmalloc_and_profiler.so \
+    CPUPROFILE_FREQUENCY=1000 \
+    CPUPROFILE=$ave_gpt_cpuprofile \
+        `which python` `which athena.py` --stdcmalloc $args
+    sc=$?
+    echo "::: running gpt-cpu-profiler (outfile=$ave_gpt_cpuprofile)... [done]"
+    return $sc
+}
+
+function ave-gpt-mem-profile()
+{
+    args=("$@")
+    ave_gpt_memprofile=ave-gpt-$$.mem.profile
+    /bin/rm -rf ${ave_gpt_memprofile}* 2> /dev/null
+    echo "::: running gpt-mem-profiler (outfile=$ave_gpt_memprofile)..."
+    TCMALLOCDIR=${ATLAS_GPERFTOOLS_DIR} \
+    LD_PRELOAD=libtcmalloc_and_profiler.so \
+    HEAPPROFILE=$ave_gpt_memprofile \
+        `which python` `which athena.py` --stdcmalloc $args
+    sc=$?
+    echo "::: running gpt-mem-profiler (outfile=$ave_gpt_memprofile)... [done]"
+    return $sc
+}
+
+function ave-gpt-analyze()
+{
+    profile=$1; shift;
+
+    pprof --callgrind `which python` $profile >| ${profile}.callgrind
+    sc=$?
+    return $sc
+}
