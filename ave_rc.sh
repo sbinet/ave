@@ -326,6 +326,12 @@ function ave-valgrind-drd()
         `which athena.py` --stdcmalloc $args 2>&1 | tee valgrind.drd.log
 }
 
+ave-valgrind-massif () {
+        args=("$@")
+        nargs=${#args[@]}
+        ${AVE_VALGRIND} --tool=massif --trace-children=yes `which athena.py` --stdcmalloc $args 2>& 1 | tee valgrind.massif.log
+}
+
 function ave-voms-proxy-init()
 {
   export X509_USER_PROXY=${HOME}/private/x509proxy
