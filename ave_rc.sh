@@ -28,6 +28,7 @@ if [[ -e "/proc/cpuinfo" ]]; then
 else
     export AVE_NCPUS='1'
 fi
+
 export AVE_MAKE_DEFAULT_OPTS='-s -j${AVE_NCPUS} -l${AVE_NCPUS} QUIET=1 PEDANTIC=1'
 
 export AVE_VALGRIND=${HOME}/.local/usr/bin/valgrind
@@ -76,13 +77,13 @@ function ave-login()
 #default32 = False       # asetup is now clever enough to choose
 #force32bit = False      # the correct 32/64 default
 opt = True
-gcc43default = True
+gcc47default = True
 lang = C
 hastest = True           # to prepend pwd to cmtpath
 #pedantic = True         # problematic for kits (missing .stamp files)
 runtime = True
 setup = True
-os = slc5
+os = slc6
 #project = AtlasOffline  # offline is the default
 save = True
 #standalone = False      # prefer build area instead of kit-release
