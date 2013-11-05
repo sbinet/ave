@@ -52,15 +52,17 @@ function ave-login()
     nargs=${#args[@]}
     if [ $nargs -lt 1 ]; then
         # try to get informations from a previous login...
-        if [[ -e ".ave_config.rc" ]]; then
+        if [[ -e ".ave_store.cmt" ]]; then
             echo "::: taking configuration from previous login..."
-            echo "======="
-            cat .ave_config.rc
-            echo "======="
+            eval `atl-cmt-load-env -f .ave_store.cmt`
+            rc=$?
+            echo "::: cmt-configuration: [$CMTCONFIG]"
+            cmt show path || return 1
             #args=`grep 'login-args' .ave_config.rc | cut -d= -f2`
             #args=${args// /}
             args=`grep 'login-args' .ave_config.rc | sed "s/login-args = //"`
             #args=${args// /}
+            return $rc
         fi
     #else
         #args=$1; shift
@@ -73,44 +75,10 @@ function ave-login()
         return 1
     fi
 
-    echo "::: generating asetup.cfg..."
-
-    /bin/cat >| ${PWD}/.asetup.cfg <<EOF
-[defaults]
-#default32 = True
-#default32 = False       # asetup is now clever enough to choose
-#force32bit = False      # the correct 32/64 default
-opt = True
-gcc47default = True
-lang = C
-hastest = True           # to prepend pwd to cmtpath
-#pedantic = True         # problematic for kits (missing .stamp files)
-runtime = True
-setup = True
-os = slc6
-#project = AtlasOffline  # offline is the default
-save = True
-#standalone = False      # prefer build area instead of kit-release
-#standalone = True       # prefer release area instead of build-area
-testarea=<pwd>           # have the current working directory be the testarea
-cmtbcast = False         # disable cmt-broadcast
-
-[aliases]
-cvmfs = releasesarea=/cvmfs/atlas.cern.ch/software/\$CMTCONFIG:/afs/cern.ch/atlas/software/releases; nightliesarea=/cvmfs/atlas-nightlies.cern.ch/repo/sw/nightlies/\$CMTCONFIG:/cvmfs/atlas-nightlies.cern.ch/repo/sw/patch_nightlies/\$CMTCONFIG:/afs/cern.ch/atlas/software/builds/nightlies; nightliesdirs=<branches>:<branches>-<project>/rel_
-
-EOF
-
     export AVE_LOGIN_ARGS="${args[@]}"
     echo "::: configuring athena for [$AVE_LOGIN_ARGS]..."
-    source $AtlasSetup/scripts/asetup.sh --input=${PWD}/.asetup.cfg "${AVE_LOGIN_ARGS}" || return 1
-    /bin/cat >| .ave_config.rc <<EOF
-[ave]
-login-time = `date`
-login-args = $AVE_LOGIN_ARGS
-cmtconfig  = $CMTCONFIG
-hostname   = `hostname`
-EOF
-
+    atl-cmt-save-env -f .ave_store.cmt "${AVE_LOGIN_ARGS}" || return 1
+    eval `atl-cmt-load-env -f .ave_store.cmt`
     echo "::: cmt-configuration: [$CMTCONFIG]"
     cmt show path || return 1
     echo "::: configuring athena for [$AVE_LOGIN_ARGS]... [done]"
