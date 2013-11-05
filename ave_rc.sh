@@ -41,6 +41,10 @@ export AVE_CMT_ROOT=/afs/cern.ch/sw/contrib/CMT
 # enable cmt-v1r24 parallel make
 export AVE_CMTBCAST=1
 
+# setup AtlasLocalRootBase
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+alias ave-alrb='. ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh'
+
 function ave-login()
 {
     args=("$@")
