@@ -58,10 +58,6 @@ function ave-login()
             rc=$?
             echo "::: cmt-configuration: [$CMTCONFIG]"
             cmt show path || return 1
-            #args=`grep 'login-args' .ave_config.rc | cut -d= -f2`
-            #args=${args// /}
-            args=`grep 'login-args' .ave_config.rc | sed "s/login-args = //"`
-            #args=${args// /}
             return $rc
         fi
     #else
